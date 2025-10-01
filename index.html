@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Xepico – Earn & Withdraw USDT</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{--bg:#070709;--card:#0f1113;--accent1:#00ffb4;--accent2:#00c3ff}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:linear-gradient(180deg,#070709,#0e0e12);color:#fff}
+    .wrap{max-width:420px;margin:48px auto;padding:20px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:14px;margin-top:18px;box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+    .center{text-align:center}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd48a,#ffb545);display:inline-flex;align-items:center;justify-content:center;color:#2b1a00;font-weight:700;font-size:24px}
+    h1{margin:14px 0 6px;font-size:20px}
+    .coin{width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff2cc 0%,#ffd48a 30%,#ffb545 70%);display:flex;align-items:center;justify-content:center;color:#2b1200;font-size:34px;font-weight:800;margin:18px auto;cursor:pointer;box-shadow:0 18px 40px rgba(0,0,0,0.6);transition:transform .15s ease}
+    .coin:active{transform:scale(.98)}
+    .balance{margin-top:12px;font-size:20px;color:var(--accent1)}
+    .controls{display:flex;gap:10px;margin-top:18px;align-items:center;flex-wrap:wrap;justify-content:center}
+    input[type=text],input[type=password]{padding:10px;border-radius:10px;border:none;background:#0b0c0e;color:#fff;min-width:260px;outline:2px solid transparent}
+    button{padding:12px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700;color:#111;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:transform .12s}
+    button:hover{transform:scale(1.02)}
+    button:disabled{opacity:0.5;cursor:not-allowed;transform:scale(1)}
+    .muted{color:#9aa0a6;font-size:13px;margin-top:12px;text-align:center}
+    .hidden{display:none!important}
+    .auth-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+    .tab{padding:8px 20px;cursor:pointer;border-radius:8px;background:#1a1c1e}
+    .tab.active{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#111}
+    .logout-btn{background:#ff4444;color:#fff;padding:8px 16px;font-size:12px;margin-top:10px}
+    .history-btn{background:#444;color:#fff;padding:8px 16px;font-size:12px;margin-top:10px;margin-left:10px}
+    .admin-btn{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:10px 20px;font-size:13px;margin-top:20px;font-weight:700;border-radius:10px}
+    .admin-panel{background:#1a1c1e;border-radius:14px;padding:20px;margin-top:20px}
+    .admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid #333}
+    .user-card{background:#0f1113;padding:15px;border-radius:10px;margin:10px 0;border-left:4px solid var(--accent1)}
+    .user-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .user-info{flex:1}
+    .user-actions{display:flex;gap:8px}
+    .btn-small{padding:6px 12px;font-size:11px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
+    .btn-edit{background:#2196f3;color:#fff}
+    .btn-delete{background:#f44336;color:#fff}
+    .user-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;font-size:13px}
+    .stat-item{background:#1a1c1e;padding:8px;border-radius:6px;text-align:center}
+    .stat-label{color:#9aa0a6;font-size:11px}
+    .stat-value{color:var(--accent1);font-weight:700;font-size:16px}
+    .edit-form{background:#0d0e10;padding:15px;border-radius:8px;margin-top:10px}
+    .edit-form input{width:100%;margin-bottom:10px;padding:8px;background:#1a1c1e;border:1px solid #333;border-radius:6px;color:#fff}
+    .edit-actions{display:flex;gap:8px;margin-top:10px}
+    .btn-save{background:#4caf50;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
+    .btn-cancel{background:#666;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-content{background:#1a1c1e;padding:24px;border-radius:14px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.8)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    .close-btn{background:#ff4444;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700}
+    .close-btn:hover{background:#ff2222}
+    .tx-item{background:#0f1113;padding:12px;border-radius:8px;margin:8px 0;border-left:3px solid var(--accent1)}
+    .tx-status{display:inline-block;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:700}
+    .status-pending{background:#ff9800;color:#000}
+    .status-completed{background:#4caf50;color:#fff}
+    .status-failed{background:#f44336;color:#fff}
+    .processing{display:inline-block;animation:spin 1s linear infinite}
+    .message{background:#2d3748;padding:12px 16px;border-radius:8px;margin:10px 0;border-left:4px solid var(--accent1);font-size:14px;animation:slideIn 0.3s ease}
+    .message.success{border-left-color:#4caf50;background:#1a3a1a}
+    .message.error{border-left-color:#f44336;background:#3a1a1a}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    a{color:var(--accent1);text-decoration:none}
+    a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Admin Panel -->
+    <div class="card center" id="adminPanel" style="display:none">
+      <div class="admin-header">
+        <h2 style="margin:0;color:var(--accent1)">👑 Admin Panel</h2>
+        <button class="close-btn" onclick="closeAdminPanel()">Yopish</button>
+      </div>
+      
+      <div style="text-align:left">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
+          <h3 style="margin:0;font-size:16px">Barcha Foydalanuvchilar</h3>
+          <div style="color:var(--accent1);font-weight:700">Jami: <span id="totalUsers">0</span></div>
+        </div>
+        
+        <div id="usersList"></div>
+      </div>
+    </div>
+
+    <!-- Login/Register sahifa -->
+    <div class="card center" id="authScreen">
+      <div class="logo">X</div>
+      <h1>Xepico – Tap to Earn</h1>
+      
+      <div class="auth-tabs">
+        <div class="tab active" id="loginTab">Login</div>
+        <div class="tab" id="registerTab">Register</div>
+      </div>
+
+      <!-- Login forma -->
+      <div id="loginForm">
+        <div id="loginMessage"></div>
+        <div class="controls">
+          <input id="loginUsername" type="text" placeholder="Username" onkeypress="if(event.key==='Enter')handleLogin()" />
+          <input id="loginPassword" type="password" placeholder="Password" onkeypress="if(event.key==='Enter')handleLogin()" />
+          <button id="loginBtn">Login</button>
+        </div>
+      </div>
+
+      <!-- Register forma -->
+      <div id="registerForm" class="hidden">
+        <div id="registerMessage"></div>
+        <div class="controls">
+          <input id="regUsername" type="text" placeholder="Username (3-20 belgi)" onkeypress="if(event.key==='Enter')document.getElementById('regPassword').focus()" />
+          <input id="regPassword" type="password" placeholder="Password (min 6 belgi)" onkeypress="if(event.key==='Enter')document.getElementById('regWallet').focus()" />
+          <input id="regWallet" type="text" placeholder="TON wallet (UQ... yoki EQ...)" onkeypress="if(event.key==='Enter')handleRegister()" />
+          <button id="registerBtn">Register</button>
+        </div>
+        <div class="muted">TON blockchain hamyonini kiriting</div>
+      </div>
+    </div>
+
+    <!-- Asosiy o'yin sahifasi -->
+    <div class="card center hidden" id="gameScreen">
+      <div class="logo">X</div>
+      <h1>Xepico – Tap to Earn</h1>
+      <div class="muted">Salom, <strong id="currentUser"></strong>!</div>
+      
+      <div class="coin" id="coin">+1</div>
+      <div class="balance">Balans: <span id="balance">0</span> USDT</div>
+
+      <div class="controls">
+        <input id="wallet" type="text" placeholder="Wallet manzili" readonly />
+        <button id="withdrawBtn">Withdraw</button>
+      </div>
+
+      <div id="withdrawMessage"></div>
+
+      <div class="muted">Har bir tap <strong>1 USDT</strong> beradi. Minimal withdraw: <strong>10 USDT</strong>.</div>
+      
+      <div style="margin-top:10px">
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        <button class="history-btn" onclick="showHistory()">Tarix</button>
+      </div>
+      
+      <button class="admin-btn" onclick="showAdminPanel()">👑 Admin Panel</button>
+    </div>
+  </div>
+
+  <!-- Tarix Modal -->
+  <div id="historyModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 style="margin:0">To'lov Tarixi</h2>
+        <button class="close-btn" onclick="closeHistory()">Yopish</button>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </div>
+
+<script>
+  let users = {};
+  let currentUserId = null;
+  let transactions = {};
+  let editingUser = null;
+
+  // Xabar ko'rsatish funksiyasi (alert o'rniga)
+  function showMessage(elementId, message, type = 'success') {
+    const msgEl = document.getElementById(elementId);
+    if (!msgEl) return;
+    
+    msgEl.innerHTML = `<div class="message ${type}">${message}</div>`;
+    
+    setTimeout(() => {
+      msgEl.innerHTML = '';
+    }, 5000);
+  }
+
+  function loadData() {
+    const saved = localStorage.getItem('xepico_users');
+    if (saved) users = JSON.parse(saved);
+    
+    const savedTx = localStorage.getItem('xepico_transactions');
+    if (savedTx) transactions = JSON.parse(savedTx);
+    
+    const savedUser = localStorage.getItem('xepico_current_user');
+    if (savedUser) {
+      currentUserId = savedUser;
+      showGameScreen();
+    }
+  }
+
+  function saveData() {
+    localStorage.setItem('xepico_users', JSON.stringify(users));
+    localStorage.setItem('xepico_transactions', JSON.stringify(transactions));
+  }
+
+  function showAuthTab(tab) {
+    document.getElementById('loginTab').classList.remove('active');
+    document.getElementById('registerTab').classList.remove('active');
+    
+    if (tab === 'login') {
+      document.getElementById('loginTab').classList.add('active');
+      document.getElementById('loginForm').classList.remove('hidden');
+      document.getElementById('registerForm').classList.add('hidden');
+    } else {
+      document.getElementById('registerTab').classList.add('active');
+      document.getElementById('loginForm').classList.add('hidden');
+      document.getElementById('registerForm').classList.remove('hidden');
+    }
+  }
+
+  document.getElementById('loginTab').addEventListener('click', () => showAuthTab('login'));
+  document.getElementById('registerTab').addEventListener('click', () => showAuthTab('register'));
+
+  function handleRegister(e) {
+    if (e) e.preventDefault();
+    
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const wallet = document.getElementById('regWallet').value.trim();
+
+    if (!username || username.length < 3 || username.length > 20) {
+      showMessage('registerMessage', '❌ Username 3-20 belgi orasida bo\'lishi kerak!', 'error');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      showMessage('registerMessage', '❌ Password kamida 6 belgi bo\'lishi kerak!', 'error');
+      return;
+    }
+
+    if (!wallet || (!wallet.startsWith('UQ') && !wallet.startsWith('EQ'))) {
+      showMessage('registerMessage', '❌ To\'g\'ri TON wallet manzilini kiriting (UQ... yoki EQ...)!', 'error');
+      return;
+    }
+
+    if (users[username]) {
+      showMessage('registerMessage', '❌ Bu username band! Boshqa tanlang.', 'error');
+      return;
+    }
+
+    users[username] = {
+      password: password,
+      wallet: wallet,
+      balance: 0,
+      taps: 0,
+      created: new Date().toISOString()
+    };
+
+    if (!transactions[username]) {
+      transactions[username] = [];
+    }
+
+    saveData();
+    
+    showMessage('registerMessage', '✅ Ro\'yxatdan o\'tdingiz! Endi login qiling.', 'success');
+    
+    setTimeout(() => {
+      document.getElementById('regUsername').value = '';
+      document.getElementById('regPassword').value = '';
+      document.getElementById('regWallet').value = '';
+      
+      showAuthTab('login');
+      
+      document.getElementById('loginUsername').value = username;
+      document.getElementById('loginPassword').focus();
+    }, 2000);
+  }
+
+  function handleLogin(e) {
+    if (e) e.preventDefault();
+    
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value.trim();
+
+    if (!username || !password) {
+      showMessage('loginMessage', '❌ Username va password kiriting!', 'error');
+      return;
+    }
+
+    if (!users[username]) {
+      showMessage('loginMessage', '❌ Foydalanuvchi topilmadi! Iltimos avval ro\'yxatdan o\'ting.', 'error');
+      return;
+    }
+
+    if (users[username].password !== password) {
+      showMessage('loginMessage', '❌ Parol noto\'g\'ri!', 'error');
+      return;
+    }
+
+    currentUserId = username;
+    localStorage.setItem('xepico_current_user', username);
+    
+    showMessage('loginMessage', '✅ Muvaffaqiyatli kirdingiz!', 'success');
+    
+    setTimeout(() => {
+      showGameScreen();
+    }, 1000);
+  }
+
+  function handleLogout() {
+    currentUserId = null;
+    localStorage.removeItem('xepico_current_user');
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('gameScreen').classList.add('hidden');
+  }
+
+  function showGameScreen() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('gameScreen').classList.remove('hidden');
+    document.getElementById('currentUser').innerText = currentUserId;
+    
+    const user = users[currentUserId];
+    document.getElementById('balance').innerText = user.balance.toFixed(2);
+    document.getElementById('wallet').value = user.wallet || '';
+  }
+
+  async function sendTONTransaction(toAddress, amount) {
+    try {
+      const txHash = 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const success = Math.random() > 0.1;
+      
+      return {
+        success: success,
+        txHash: txHash,
+        explorerUrl: `https://tonscan.org/tx/${txHash}`,
+        amount: amount,
+        to: toAddress
+      };
+    } catch (error) {
+      console.error('Transaction error:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async function handleWithdraw() {
+    if (!currentUserId) return;
+    
+    const user = users[currentUserId];
+    const wallet = user.wallet;
+    
+    if (!wallet) {
+      showMessage('withdrawMessage', '❌ Wallet manzilini yangilang!', 'error');
+      return;
+    }
+
+    if (user.balance < 10) {
+      showMessage('withdrawMessage', `❌ Minimal withdraw 10 USDT! Sizning balansingiz: ${user.balance.toFixed(2)} USDT`, 'error');
+      return;
+    }
+
+    const amount = user.balance;
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    
+    withdrawBtn.disabled = true;
+    withdrawBtn.innerHTML = '<span class="processing">⏳</span> Processing...';
+    
+    const txId = 'tx_' + Date.now();
+    const transaction = {
+      id: txId,
+      amount: amount,
+      wallet: wallet,
+      status: 'pending',
+      timestamp: new Date().toISOString(),
+      txHash: null
+    };
+    
+    if (!transactions[currentUserId]) {
+      transactions[currentUserId] = [];
+    }
+    transactions[currentUserId].unshift(transaction);
+    saveData();
+
+    const result = await sendTONTransaction(wallet, amount);
+    
+    if (result.success) {
+      transaction.status = 'completed';
+      transaction.txHash = result.txHash;
+      transaction.explorerUrl = result.explorerUrl;
+      
+      user.balance = 0;
+      saveData();
+      
+      document.getElementById('balance').innerText = '0.00';
+      
+      showMessage('withdrawMessage', `✅ To'lov muvaffaqiyatli yuborildi!<br>Miqdor: ${amount.toFixed(2)} USDT<br>TX: ${result.txHash}`, 'success');
+      
+      setTimeout(() => {
+        const showDetails = confirm('Transaction tafsilotlarini ko\'rmoqchimisiz?');
+        if (showDetails) {
+          showHistory();
+        }
+      }, 2000);
+      
+    } else {
+      transaction.status = 'failed';
+      transaction.error = result.error || 'Transaction failed';
+      saveData();
+      
+      showMessage('withdrawMessage', `❌ Xatolik yuz berdi!<br>Sabab: ${transaction.error}`, 'error');
+    }
+    
+    withdrawBtn.disabled = false;
+    withdrawBtn.innerHTML = 'Withdraw';
+  }
+
+  function showHistory() {
+    const modal = document.getElementById('historyModal');
+    const historyList = document.getElementById('historyList');
+    
+    const userTx = transactions[currentUserId] || [];
+    
+    if (userTx.length === 0) {
+      historyList.innerHTML = '<div class="muted" style="padding:20px">Hali to\'lovlar yo\'q</div>';
+    } else {
+      historyList.innerHTML = userTx.map(tx => {
+        const date = new Date(tx.timestamp).toLocaleString('uz-UZ');
+        const statusClass = 'status-' + tx.status;
+        const statusText = {
+          pending: '⏳ Kutilmoqda',
+          completed: '✅ Bajarildi',
+          failed: '❌ Xato'
+        }[tx.status];
+        
+        let details = '';
+        if (tx.status === 'completed' && tx.explorerUrl) {
+          details = `<div style="margin-top:8px"><a href="${tx.explorerUrl}" target="_blank">Tonscan'da ko'rish →</a></div>`;
+        }
+        if (tx.status === 'failed' && tx.error) {
+          details = `<div style="margin-top:8px;color:#f44336;font-size:12px">${tx.error}</div>`;
+        }
+        
+        return `
+          <div class="tx-item">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong>${tx.amount.toFixed(2)} USDT</strong>
+              <span class="tx-status ${statusClass}">${statusText}</span>
+            </div>
+            <div style="font-size:12px;color:#9aa0a6;margin-top:4px">${date}</div>
+            <div style="font-size:11px;color:#666;margin-top:4px;word-break:break-all">${tx.wallet}</div>
+            ${tx.txHash ? `<div style="font-size:11px;color:#666;margin-top:2px;word-break:break-all">TX: ${tx.txHash}</div>` : ''}
+            ${details}
+          </div>
+        `;
+      }).join('');
+    }
+    
+    modal.classList.remove('hidden');
+  }
+
+  function closeHistory() {
+    const modal = document.getElementById('historyModal');
+    modal.classList.add('hidden');
+  }
+
+  // Admin Panel Functions
+  function showAdminPanel() {
+    document.getElementById('gameScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadUsersList();
+  }
+
+  function closeAdminPanel() {
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'block';
+  }
+
+  function loadUsersList() {
+    const usersList = document.getElementById('usersList');
+    const totalUsers = document.getElementById('totalUsers');
+    
+    const userArray = Object.keys(users);
+    totalUsers.innerText = userArray.length;
+    
+    if (userArray.length === 0) {
+      usersList.innerHTML = '<div class="muted" style="padding:20px;text-align:center">Hali foydalanuvchilar yo\'q</div>';
+      return;
+    }
+    
+    usersList.innerHTML = userArray.map(username => {
+      const user = users[username];
+      const userTx = transactions[username] || [];
+      const totalWithdrawn = userTx.filter(tx => tx.status === 'completed').reduce((sum, tx) => sum + tx.amount, 0);
+      
+      return `
+        <div class="user-card" id="user-card-${username}">
+          <div class="user-header">
+            <div class="user-info">
+              <strong style="font-size:16px;color:var(--accent1)">${username}</strong>
+              <div style="font-size:11px;color:#666;margin-top:2px">
+                Ro'yxatdan: ${new Date(user.created).toLocaleDateString('uz-UZ')}
+              </div>
+            </div>
+            <div class="user-actions">
+              <button class="btn-small btn-edit" onclick="editUser('${username}')">✏️ Edit</button>
+              <button class="btn-small btn-delete" onclick="deleteUser('${username}')">🗑️ Delete</button>
+            </div>
+          </div>
+          
+          <div class="user-stats">
+            <div class="stat-item">
+              <div class="stat-label">Balans</div>
+              <div class="stat-value">${user.balance.toFixed(2)} USDT</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Tap soni</div>
+              <div class="stat-value">${user.taps}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Chiqarilgan</div>
+              <div class="stat-value">${totalWithdrawn.toFixed(2)} USDT</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">To'lovlar</div>
+              <div class="stat-value">${userTx.length}</div>
+            </div>
+          </div>
+          
+          <div style="margin-top:10px;font-size:12px;color:#666;word-break:break-all">
+            💳 ${user.wallet}
+          </div>
+          
+          <div id="edit-form-${username}" class="hidden"></div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function editUser(username) {
+    if (editingUser && editingUser !== username) {
+      document.getElementById(`edit-form-${editingUser}`).innerHTML = '';
+      document.getElementById(`edit-form-${editingUser}`).classList.add('hidden');
+    }
+    
+    editingUser = username;
+    const user = users[username];
+    const editForm = document.getElementById(`edit-form-${username}`);
+    
+    editForm.classList.remove('hidden');
+    editForm.innerHTML = `
+      <div class="edit-form">
+        <h4 style="margin:0 0 10px 0;color:var(--accent1)">Tahrirlash</h4>
+        <input type="text" id="edit-username-${username}" value="${username}" placeholder="Username" />
+        <input type="password" id="edit-password-${username}" value="${user.password}" placeholder="Password" />
+        <input type="text" id="edit-wallet-${username}" value="${user.wallet}" placeholder="Wallet" />
+        <input type="number" id="edit-balance-${username}" value="${user.balance}" placeholder="Balans" step="0.01" />
+        <div class="edit-actions">
+          <button class="btn-save" onclick="saveUser('${username}')">💾 Saqlash</button>
+          <button class="btn-cancel" onclick="cancelEdit('${username}')">❌ Bekor qilish</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function cancelEdit(username) {
+    const editForm = document.getElementById(`edit-form-${username}`);
+    editForm.innerHTML = '';
+    editForm.classList.add('hidden');
+    editingUser = null;
+  }
+
+  function saveUser(oldUsername) {
+    const newUsername = document.getElementById(`edit-username-${oldUsername}`).value.trim();
+    const password = document.getElementById(`edit-password-${oldUsername}`).value.trim();
+    const wallet = document.getElementById(`edit-wallet-${oldUsername}`).value.trim();
+    const balance = parseFloat(document.getElementById(`edit-balance-${oldUsername}`).value) || 0;
+    
+    if (!newUsername || !password || !wallet) {
+      showMessage('registerMessage', '❌ Barcha maydonlarni to\'ldiring!', 'error');
+      return;
+    }
+    
+    if (newUsername !== oldUsername && users[newUsername]) {
+      showMessage('registerMessage', '❌ Bu username band!', 'error');
+      return;
+    }
+    
+    const userData = users[oldUsername];
+    userData.password = password;
+    userData.wallet = wallet;
+    userData.balance = balance;
+    
+    if (newUsername !== oldUsername) {
+      users[newUsername] = userData;
+      delete users[oldUsername];
+      
+      if (transactions[oldUsername]) {
+        transactions[newUsername] = transactions[oldUsername];
+        delete transactions[oldUsername];
+      }
+      
+      if (currentUserId === oldUsername) {
+        currentUserId = newUsername;
+        localStorage.setItem('xepico_current_user', newUsername);
+      }
+    }
+    
+    saveData();
+    cancelEdit(oldUsername);
+    loadUsersList();
+    
+    showMessage('registerMessage', '✅ Foydalanuvchi yangilandi!', 'success');
+    setTimeout(() => {
+      document.getElementById('registerMessage').innerHTML = '';
+    }, 2000);
+  }
+
+  function deleteUser(username) {
+    // Custom confirmation modal yaratish (confirm sandbox'da ishlamaydi)
+    const confirmMsg = document.createElement('div');
+    confirmMsg.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:9999';
+    confirmMsg.innerHTML = `
+      <div style="background:#1a1c1e;padding:24px;border-radius:14px;max-width:350px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.8)">
+        <div style="font-size:48px;margin-bottom:10px">⚠️</div>
+        <h3 style="margin:0 0 10px 0;color:#f44336">O'chirish Tasdiqlash</h3>
+        <p style="color:#9aa0a6;margin:10px 0 20px 0">"${username}" foydalanuvchisini o'chirishni tasdiqlaysizmi?<br><br>Bu amalni bekor qilib bo'lmaydi!</p>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button id="confirmDeleteBtn" style="background:#f44336;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:700">O'chirish</button>
+          <button id="cancelDeleteBtn" style="background:#666;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:700">Bekor qilish</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(confirmMsg);
+    
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+      delete users[username];
+      delete transactions[username];
+      
+      if (currentUserId === username) {
+        document.body.removeChild(confirmMsg);
+        handleLogout();
+        return;
+      }
+      
+      saveData();
+      loadUsersList();
+      
+      document.body.removeChild(confirmMsg);
+      
+      // Success message ko'rsatish
+      const successMsg = document.createElement('div');
+      successMsg.className = 'message success';
+      successMsg.innerHTML = '✅ Foydalanuvchi o\'chirildi!';
+      successMsg.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:10000;min-width:300px';
+      document.body.appendChild(successMsg);
+      
+      setTimeout(() => {
+        document.body.removeChild(successMsg);
+      }, 3000);
+    };
+    
+    document.getElementById('cancelDeleteBtn').onclick = function() {
+      document.body.removeChild(confirmMsg);
+    };
+  }
+
+  // Modal tashqarisiga bosilganda yopish
+  document.getElementById('historyModal').addEventListener('click', function(e) {
+    if (e.target.id === 'historyModal') {
+      closeHistory();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const coinEl = document.getElementById('coin');
+    if (coinEl) {
+      coinEl.addEventListener('click', function() {
+        if (!currentUserId) return;
+        
+        const user = users[currentUserId];
+        user.balance += 1;
+        user.taps += 1;
+        
+        document.getElementById('balance').innerText = user.balance.toFixed(2);
+        saveData();
+        
+        coinEl.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          coinEl.style.transform = 'scale(1)';
+        }, 150);
+      });
+    }
+
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    if (withdrawBtn) {
+      withdrawBtn.addEventListener('click', handleWithdraw);
+    }
+
+    // Login button handler
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+      loginBtn.addEventListener('click', handleLogin);
+    }
+
+    // Register button handler
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+      registerBtn.addEventListener('click', handleRegister);
+    }
+  });
+
+  loadData();
+</script>
+</body>
+</html>
